@@ -5,14 +5,7 @@ from typing import Tuple, Dict, Any
 
 from screencap import make_dir_relative
 
-# ... (all the functions from the previous file are unchanged) ...
-# _calculate_cell_dimensions
-# _get_font_properties
-# _get_box_properties
-# _draw_label_background_box
-# _draw_label_in_cell
-# add_labels
-# ... (all these functions are the same) ...
+DIVISIONS = (25, 25)
 
 def _calculate_cell_dimensions(img_shape: Tuple[int, ...], 
                                divisions: Tuple[int, int]) -> Tuple[int, int]:
@@ -185,14 +178,14 @@ def get_labeled_screenshot(source: str) -> str:
     
     img = cv2.imread(source)
 
-    divisions = (20, 20)         # 10 rows, 10 columns
+    divisions = DIVISIONS         # 20 rows, 20 columns
     
     text_color = (255, 255, 255) # White (BGR)
     font_scale = 0.6             # Increased from 0.6
     font_thickness = 1
     
     box_color = (0, 0, 0)        # Black (BGR)
-    box_alpha = 0.2              # 70% opaque
+    box_alpha = 0.4              # 70% opaque
     
     # 1. Add numbered labels
     output = add_labels(
