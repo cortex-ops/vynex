@@ -1,6 +1,7 @@
 from typing import Tuple
 import tkinter
 import time
+import os
 import subprocess
 
 from screenshot_processing import ScreenshotProcessor
@@ -16,6 +17,8 @@ class ActionAgent():
         self.parser = parser
         self.llm_interface = llm_interface
         self.folder = folder
+
+        self.past_screenshots = []
 
     def get_prompt_image_pair(self) -> Tuple[str]:
         screenshot_path = take_screenshot(self.folder)
@@ -41,7 +44,14 @@ class ActionAgent():
         return end_action
     
     def run_llm_prompt(self, user_goal: str) -> Tuple[str, bool]:
+        # delete past screenshots
+        for image in self.past_screenshots:
+            os.remove(image)
+            self.past_screenshots.remove(image)
+
         screenshot_path, labeled_screenshot_path = self.get_prompt_image_pair()
+        self.past_screenshots.append(screenshot_path)
+        self.past_screenshots.append(labeled_screenshot_path)
         
         action_sequence = self.llm_interface.get_action(user_goal, screenshot_path, labeled_screenshot_path)
         end_action = self.complete_action_sequence(action_sequence)
@@ -56,9 +66,7 @@ class ActionAgent():
             print("Getting new screenshot...")
             new_prompt = f"The original task is {user_goal} Your previous instructions were \n{('\n'.join(sequences)) or "None"} \n Here are the new screenshots, continue"
             action_sequence, end_action = self.run_llm_prompt(new_prompt)
-            sequences.append(action_sequence)
-        return True
-            
+            sequences.append(action_sequence)            
 
 if __name__ == "__main__":
     folder = 'screencaps'
