@@ -44,7 +44,10 @@ class Parser():
         return final_command
 
     def get_keys_command(self, action_detail: dict) -> str:
-        delay = action_detail["delay"]
+        try:
+            delay = action_detail["delay"]
+        except KeyError:
+            delay = 20
         codes = action_detail["codes"]
 
         key_list = []
@@ -57,7 +60,10 @@ class Parser():
         return final_command
 
     def get_type_command(self, action_detail: dict):
-        delay = action_detail["delay"]
+        try:
+            delay = action_detail["delay"]
+        except KeyError:
+            delay = 20
         string = action_detail["string"]
 
         final_command = f"ydotool type -d {delay} \"{string}\""
@@ -77,7 +83,7 @@ class Parser():
         final_command = f"sleep {delay}"
         return final_command
     
-    def get_end_command(action_detail: dict[str, bool]) -> bool:
+    def get_end_command(self, action_detail: dict[str, bool]) -> bool:
         to_stop = action_detail["stop"]
         return to_stop
 
@@ -112,7 +118,7 @@ class Parser():
 
 if __name__ == "__main__":
 
-    parser = Parser((1080, 1920, 3))
+    parser = Parser((1080, 1920, 3), (30, 30))
 
     action = input("Enter action: ")
     
