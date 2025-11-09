@@ -1,13 +1,12 @@
 from typing import Tuple
 
-from screenshot_processing import DIVISIONS
-
 class Parser():
-    def __init__(self, img_shape: Tuple[int]):
+    def __init__(self, img_shape: Tuple[int, ...], divisions: Tuple[int, int]):
         self.img_shape = img_shape
+        self.divisions = divisions
 
     def get_cell_center_coords(self, pos: int) -> Tuple[int, int]:
-        num_rows, num_cols = DIVISIONS
+        num_rows, num_cols = self.divisions
         
         cell_height = self.img_shape[0] // num_rows
         cell_width = self.img_shape[1] // num_cols
@@ -23,7 +22,7 @@ class Parser():
         
         return (x_center, y_center)
 
-    def get_pos_coords(self, pos: int) -> tuple[int]:    
+    def get_pos_coords(self, pos: int) -> Tuple[int, int]:    
         coords = self.get_cell_center_coords(pos)
         return coords
 
@@ -98,7 +97,6 @@ class Parser():
 
         final_command = " && ".join(command_list)
         return final_command
-
 
     def parse_actions_string(self, action_string: str) -> str:
         actions = eval(action_string)
