@@ -60,7 +60,7 @@ def make_dir_relative(pathname: str) -> str:
     make_dir(folder_path)
     return folder_path
 
-def take_screenshot() -> str:
+def take_screenshot(folder: str) -> str:
     """
     Takes a screenshot using 'grim' and saves it to a 'screencaps' folder.
     
@@ -70,8 +70,8 @@ def take_screenshot() -> str:
     Returns:
         The absolute path to the newly created screenshot file.
     """
-    FOLDER = "screencaps"
-    folder_path = make_dir_relative(FOLDER)
+    # FOLDER = "screencaps"
+    folder_path = make_dir_relative(folder)
     screenshot_name = get_screenshot_name()
     screenshot_path = os.path.join(folder_path, screenshot_name)
 
