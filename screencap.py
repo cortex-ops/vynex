@@ -41,9 +41,10 @@ def make_dir(pathname: str) -> None:
     """
     if not os.path.exists(pathname):
         os.mkdir(pathname)
-        print(f'INFO: Directory {pathname} created')
+        # print(f'INFO: Directory {pathname} created')
     else:
-        print(f'INFO: Directory {pathname} already exists, skipping...')
+        # print(f'INFO: Directory {pathname} already exists, skipping...')
+        pass
 
 def make_dir_relative(pathname: str) -> str:
     """
@@ -83,7 +84,6 @@ def take_screenshot(folder: str) -> str:
 
 
 if __name__ == "__main__":
-    print(f"Root path: {get_root_path()}")
-    print(f"Generated name: {get_screenshot_name()}")
-    saved_path = take_screenshot()
+    folder = 'screencaps'
+    saved_path = take_screenshot(folder)
     print(f"Screenshot saved to: {saved_path}")

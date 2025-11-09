@@ -184,11 +184,11 @@ class ScreenshotProcessor():
         divisions = self.divisions
         
         text_color = (255, 255, 255) # White (BGR)
-        font_scale = 0.6             # Increased from 0.6
+        font_scale = 0.65            # Increased from 0.6
         font_thickness = 1
         
         box_color = (0, 0, 0)        # Black (BGR)
-        box_alpha = 0.4              # 70% opaque
+        box_alpha = 0.7              # 70% opaque
         
         # 1. Add numbered labels
         output = self.add_labels(
@@ -211,6 +211,7 @@ class ScreenshotProcessor():
 
 
 if __name__ == '__main__':
+    folder = 'labeled_screencaps'
     divisions = (30, 30)
-    processor = ScreenshotProcessor(divisions)
+    processor = ScreenshotProcessor(divisions, folder)
     processor.get_labeled_screenshot(os.path.join('screencaps', os.listdir('screencaps')[-1]))
