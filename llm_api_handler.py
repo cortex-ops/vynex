@@ -1,21 +1,36 @@
-from google import generativeai
+# from google import generativeai
+from google import genai
 from PIL import Image
 import os
 from dotenv import load_dotenv
 
 class LLMInterface:
-    def __init__(self, model_name: str, system_prompt_file: str):
-        self.model_name = model_name
+    def __init__(self, model_name: str, system_prompt_file: str, include_thinking: bool = True):
         self._configure_api()
         
         system_prompt = self._load_system_prompt(system_prompt_file)
-        self.model = self._initialize_model(system_prompt)
+        generation_config = genai.types.GenerateContentConfig(
+            system_instruction=system_prompt,
+            thinking_config=genai.types.ThinkingConfig(
+                include_thoughts=include_thinking
+            )
+        )
+        
+        try:
+            self.model = self._initialize_model()
+        except ValueError:
+            print("API key not found, please make you have a .env file with GEMINI_API_KEY=<your api key>")
+
+        self.chat = self.model.chats.create(
+            model=model_name,
+            config=generation_config
+        )
+        
         print("LLMInterface initialized successfully.")
 
+
     def _configure_api(self):
-        load_dotenv()
-        api_key = os.getenv("GEMINI_API_KEY")
-        generativeai.configure(api_key=api_key)
+        load_dotenv('.env')
         print("API configured.")
 
     def _load_system_prompt(self, filepath: str) -> str:
@@ -24,19 +39,11 @@ class LLMInterface:
             return f.read()
 
 
-    def _initialize_model(self, system_prompt: str) -> generativeai.GenerativeModel:
+    def _initialize_model(self) -> genai.Client:
         """Initializes the GenerativeModel with system instructions."""
-        
-        generation_config = {
-            "response_mime_type": "text/plain",
-        }
 
-        print(f"Initializing model: {self.model_name}...")
-        model = generativeai.GenerativeModel(
-            model_name=self.model_name,
-            system_instruction=system_prompt,
-            generation_config=generation_config
-        )
+        print(f"Initializing client")
+        model = genai.Client()
         print("Model initialized.")
         return model
 
@@ -52,7 +59,7 @@ class LLMInterface:
 
         prompt_parts = [task_prompt, img_orig, img_labeled]
 
-        response = self.model.generate_content(prompt_parts)
+        response = self.chat.send_message(prompt_parts)
         return response.text
 
 if __name__ == "__main__":
