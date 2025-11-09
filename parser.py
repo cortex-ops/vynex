@@ -76,6 +76,10 @@ class Parser():
 
         final_command = f"sleep {delay}"
         return final_command
+    
+    def get_end_command(action_detail: dict[str, bool]) -> bool:
+        to_stop = action_detail["stop"]
+        return to_stop
 
     def get_action_command(self, action: tuple[int, dict]) -> str:
         action_code = action[0]
@@ -87,18 +91,22 @@ class Parser():
             return self.get_keyboard_command(action_detail)
         elif action_code == 2:
             return self.get_wait_command(action_detail)
+        elif action_code == 3:
+            return self.get_end_command(action_detail)
         
 
-    def get_actions_command(self, actions: list[tuple[int, dict]]) -> str:
+    def get_actions_command(self, actions: list[tuple[int, dict]]) -> Tuple[str, bool]:
         command_list = []
 
         for action in actions:
             command_list.append(self.get_action_command(action))
 
-        final_command = " && ".join(command_list)
-        return final_command
+        end_command = command_list.pop()
 
-    def parse_actions_string(self, action_string: str) -> str:
+        final_command = " && ".join(command_list)
+        return final_command, end_command
+
+    def parse_actions_string(self, action_string: str) -> Tuple[str, bool]:
         actions = eval(action_string)
         return self.get_actions_command(actions)
 
