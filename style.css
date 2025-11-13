@@ -1,0 +1,25 @@
+/* Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+body {
+    font-family: 'Inter', sans-serif;
+}
+/* Custom scrollbar for webkit browsers */
+.chat-container::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-container::-webkit-scrollbar-track {
+    background: #2d3748; /* gray-800 */
+}
+.chat-container::-webkit-scrollbar-thumb {
+    background: #4a5568; /* gray-600 */
+    border-radius: 3px;
+}
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background: #718096; /* gray-500 */
+}
+
+/* Basic styling for the overlay feel */
+/* You would make this more transparent in a real web view */
+body {
+    background-color: rgba(26, 32, 44, 0.95); /* gray-900 with 95% opacity */
+}
