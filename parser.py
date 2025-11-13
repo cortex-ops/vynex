@@ -26,20 +26,29 @@ class Parser():
         coords = self.get_cell_center_coords(pos)
         return coords
 
-    def get_mouse_command(self, action_detail: dict[str, int]) -> str:
-        action_map = {0: '4', 1: '8', 2: 'C'}
-        button_map = {0: '0', 1: '1', 2: '2', 3: '5', 4: '6'}
+    def get_mouse_command(self, action_detail: dict) -> str:
+        print(action_detail)
+        is_scrolling = action_detail["is_scrolling"]
 
         pos = action_detail["position"]
         x, y = self.get_pos_coords(pos)
 
-        action = action_map[action_detail["action"]]
-        button = button_map[action_detail["button"]]
-
         command1 = f"ydotool mousemove --absolute {x} {y}"
-        command2 = f"ydotool click {action}{button}"
+
+        if not is_scrolling:
+            action_map = {0: '4', 1: '8', 2: 'C'}
+            button_map = {0: '0', 1: '1', 2: '2', 3: '5', 4: '6'}
+
+            action = action_map[action_detail["action"]]
+            button = button_map[action_detail["button"]]
+
+            command2 = f"ydotool click {action}{button}"
+        else:
+            scroll = action_detail["scroll"]
+            command2 = f"ydotool mousemove -w -- {scroll[0]} {scroll[1]}"
 
         final_command = f"{command1} && {command2}"
+        print(final_command)
 
         return final_command
 
