@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Generator, Any
 import tkinter
 import time
 import os
@@ -27,7 +27,7 @@ class ActionAgent():
         return screenshot_path, labeled_screenshot_path
 
     def parse_action_sequence(self, string: str) -> Tuple[str, bool]:
-        return parser.parse_actions_string(string)
+        return self.parser.parse_actions_string(string)
 
     def execute_action_sequence(self, string: str) -> bool:
         action_command, end_action = self.parse_action_sequence(string)
@@ -43,7 +43,7 @@ class ActionAgent():
         end_action = self.execute_action_sequence(string)
         return end_action
     
-    def run_llm_prompt(self, user_goal: str) -> Tuple[str, bool]:
+    def run_llm_prompt(self, user_goal: list) -> Tuple[str, bool, str]:
         # delete past screenshots
         for image in self.past_screenshots:
             os.remove(image)
@@ -53,20 +53,25 @@ class ActionAgent():
         self.past_screenshots.append(screenshot_path)
         self.past_screenshots.append(labeled_screenshot_path)
         
-        action_sequence = self.llm_interface.get_action(user_goal, screenshot_path, labeled_screenshot_path)
+        action_sequence, thought_summary = self.llm_interface.get_action(user_goal, screenshot_path, labeled_screenshot_path)
         end_action = self.complete_action_sequence(action_sequence)
 
-        return action_sequence, end_action
+        return action_sequence, end_action, thought_summary
     
-    def run_llm_pipeline(self, user_goal: str, wait_time: int = 2):
+    def run_llm_pipeline(self, user_goal: list, wait_time: int = 2) -> Generator[tuple[str, str], Any, None]:
         end_action = False
         sequences = []
+        og_goal = user_goal[0]
         while not end_action:
             time.sleep(wait_time)
-            print("Getting new screenshot...")
-            new_prompt = f"The original task is {user_goal} Your previous instructions were \n{('\n'.join(sequences)) or "None"} \n Here are the new screenshots, continue"
-            action_sequence, end_action = self.run_llm_prompt(new_prompt)
-            sequences.append(action_sequence)            
+            if isinstance(og_goal, str):
+                new_prompt = f"The original task is {og_goal} Your previous instructions were \n{('\n'.join(sequences)) or "None"} \n Here are the new screenshots, continue"
+                new_user_goal = [new_prompt, *user_goal[1:]]
+
+            action_sequence, end_action, thought_summary = self.run_llm_prompt(new_user_goal)
+            sequences.append(action_sequence)
+
+            yield action_sequence, thought_summary
 
 if __name__ == "__main__":
     folder = 'screencaps'
