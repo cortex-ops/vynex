@@ -1,7 +1,7 @@
 # from google import generativeai
 from google import genai
 from PIL import Image
-import os
+from typing import Tuple
 from dotenv import load_dotenv
 
 class LLMInterface:
@@ -47,9 +47,10 @@ class LLMInterface:
         print("Model initialized.")
         return model
 
-    def get_action(self, user_goal: str, original_image_path: str, labeled_image_path: str) -> str:
+    def get_action(self, user_goal: list, original_image_path: str, labeled_image_path: str) -> Tuple[str, str]:
         print(f"\n--- Sending new task to Gemini ---")
-        print(f"Goal: {user_goal}")
+        if isinstance(user_goal[0], str):
+            print(f"Goal: {user_goal[0]}")
 
         task_prompt = user_goal
 
@@ -57,10 +58,28 @@ class LLMInterface:
         img_labeled = Image.open(labeled_image_path)
         print(f"Loaded images: '{original_image_path}', '{labeled_image_path}'")
 
-        prompt_parts = [task_prompt, img_orig, img_labeled]
+        prompt_parts = [*task_prompt, img_orig, img_labeled]
+        print(prompt_parts)
+
 
         response = self.chat.send_message(prompt_parts)
-        return response.text
+        for part in response.candidates[0].content.parts:
+            if not part.text:
+                continue
+            if part.thought:
+                thought_summary = part.text
+
+                print("Thought summary:")
+                print(thought_summary)
+                print()
+            else:
+                response_text = part.text
+
+                print("Answer:")
+                print(response_text)
+                print()
+
+        return response_text, thought_summary
 
 if __name__ == "__main__":
     MODEL_NAME = "gemini-2.5-flash"
